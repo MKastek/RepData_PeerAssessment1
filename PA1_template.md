@@ -65,7 +65,7 @@ maxInt <- meanStepsByInt[which.max(meanStepsByInt$steps),]
 
 ```r
 # Missing values
-missingVals <- sum(is.na(activityData))
+missingVals <- sum(is.na(activityData$steps))
 print(missingVals)
 ```
 
@@ -73,5 +73,33 @@ print(missingVals)
 ## [1] 2304
 ```
 
+
+
+```r
+# Create a new dataset that is equal to the original dataset but with 
+# the missing data filled in.
+imp_activityData <- transform(activityData,
+                              steps = ifelse(is.na(activityData$steps),
+                                             meanStepsByInt$steps[match(activityData$interval, 
+                                                                        meanStepsByInt$interval)],
+                                             activityData$steps))
+
+# Make a histogram of the total number of steps taken each day and
+# and report the mean and median.
+impStepsByInt <- aggregate(steps ~ date, imp_activityData, FUN=sum)
+hist(impStepsByInt$steps,
+     main = "Imputed Number of Steps Per Day",
+     xlab = "Number of Steps")
+```
+
+![](PA1_template_files/figure-html/missing2-1.png)<!-- -->
+
+```r
+impMeanSteps <- mean(impStepsByInt$steps, na.rm = TRUE)
+impMedSteps <- median(impStepsByInt$steps, na.rm = TRUE)
+diffMean = impMeanSteps - meanSteps
+diffMed = impMedSteps - medSteps
+diffTotal = sum(impStepsByInt$steps) - sum(totalSteps$steps)
+```
 
 ## Are there differences in activity patterns between weekdays and weekends?
